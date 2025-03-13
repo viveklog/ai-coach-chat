@@ -1,0 +1,21 @@
+.custom-message-ui {
+    --cmui-gap-size: 0.5rem;
+    --cmui-inline-spacing: 2rem;
+    --cmui-block-spacing: 0.5rem;
+  
+    display: flex;
+    gap: var(--cmui-gap-size);
+    padding-inline: var(--cmui-inline-spacing);
+    padding-block: var(--cmui-block-spacing);
+  }
+  
+  .custom-message-ui__text {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+  }
+  
+  .custom-message-ui--mine {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
