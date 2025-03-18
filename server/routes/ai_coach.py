@@ -1,5 +1,5 @@
 import os
-import requests
+import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -24,8 +24,11 @@ chat_memory = {}
 
 @router.post("/ai-coach", tags=["AI Coach"])
 def ai_reply(data: UserMessage):
+    """Handles AI response generation with optimized processing."""
     try:
         print(f"📩 User ({data.user_id}) asked: {data.message}")
+
+        start_time = time.time()  # Track AI response time
 
         # Ensure user has chat history
         if data.user_id not in chat_memory:
@@ -37,19 +40,21 @@ def ai_reply(data: UserMessage):
         # Define AI system behavior
         system_message = {"role": "system", "content": "You are an AI Coach that helps users learn interactively."}
 
-        # Prepare conversation history
-        messages = [system_message] + chat_memory[data.user_id]
+        # Prepare conversation history (last 5 messages for faster response)
+        messages = [system_message] + chat_memory[data.user_id][-5:]
 
-        # ✅ Correct API Call with Model Name
+        # ✅ Call AI Model with Optimized Response Handling
         response = client.chat.complete(
-            model="mistral-small-latest",  # ✅ Explicitly specify the model
-            messages=messages
+            model="mistral-small-latest",  
+            messages=messages,
+            max_tokens=100  # ✅ Reduce max response size for speed
         )
 
-        print(f"🔍 Raw API Response: {response}")  # ✅ Print full API response
+        end_time = time.time()  # Track AI response time
+        print(f"⏳ AI Response Time: {end_time - start_time:.2f} seconds")
 
-        # ✅ Fix response extraction (New format)
-        ai_response = response.choices[0].message.content  # ✅ Correct way to access response
+        # ✅ Extract AI response properly
+        ai_response = response.choices[0].message.content if response.choices else "AI could not generate a response."
 
         print(f"✅ AI Coach Reply: {ai_response}")
 

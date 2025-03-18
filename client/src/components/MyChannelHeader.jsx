@@ -1,10 +1,12 @@
 import { useChannelStateContext } from 'stream-chat-react';
 import { useWatchers } from '../useWatchers';
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../store/authStore";
 
-export default function MyChannelHeader() {
+export default function MyChannelHeader({client}) {
   const navigate = useNavigate();
-
+  const auth = useAuthStore();
+  
   const { channel } = useChannelStateContext();
   const { watchers } = useWatchers({ channel });
 

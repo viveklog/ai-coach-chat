@@ -9,10 +9,11 @@ import {
   Window,
 } from "stream-chat-react";
 
-import "stream-chat-react/dist/css/v2/index.css";
 import MyChannelHeader from "../components/MyChannelHeader";
 import MyAIStateIndicator from "../components/MyAIStateIndicator";
+import MyMessage from "../components/MyMessage";
 import useAuthStore from "../store/authStore";
+import { useEffect } from "react";
 
 export default function ChatPage() {
 
@@ -44,18 +45,31 @@ const options= {
     userData: user,
   });
 
-  
+  useEffect(()=>{
+    const checkClient = async()=>{
+          if(!client) return;
+          const channel = client.channel("messaging", "travel", {
+            name: "Awesome channel about traveling",
+          });
+          // Here, 'travel' will be the channel ID
+          await channel.watch();
+    }
+    checkClient();
+  },[client])
+
+  console.log(client?.activeChannels);
 
   if (!client) return <div>Setting up client & connection...</div>;
 
     
-
+    
+      
   return (
     <Chat client={client}>
       <ChannelList filters={filters} sort={sort} options={options} />
-      <Channel>
+      <Channel Message={MyMessage}>
         <Window>
-          <MyChannelHeader />
+          <MyChannelHeader client={client} />
           <MessageList />
           <MyAIStateIndicator />
           <MessageInput />
