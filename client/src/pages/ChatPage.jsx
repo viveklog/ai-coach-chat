@@ -8,23 +8,28 @@ import {
   Thread,
   Window,
 } from "stream-chat-react";
+import { StreamChat } from "stream-chat";
 
 import MyChannelHeader from "../components/MyChannelHeader";
 import MyAIStateIndicator from "../components/MyAIStateIndicator";
 import MyMessage from "../components/MyMessage";
 import useAuthStore from "../store/authStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ChatPage() {
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const auth = useAuthStore();
-const userToken = auth.token;
-const userId = auth.userId;
-const userName = "Vivek Kumar";
+const navigate = useNavigate();
+// const auth.token = auth.token;
+// const auth.userId = auth.auth.userId;
+const userName = "";
+const [channel, setChannel] = useState(null);
+const [isReady, setIsReady] = useState(false);
 
 const user = {
-  id: userId,
+  id: auth.userId,
   name: userName || "User",
   image:
     "https://vignette.wikia.nocookie.net/starwars/images/6/6f/Anakin_Skywalker_RotS.png",
@@ -33,7 +38,7 @@ const user = {
 const sort= { last_message_at: -1 };
 const filters = {
   type: "messaging",
-  members: { $in: [userId] },
+  members: { $in: [auth.userId] },
 };
 const options= {
   limit: 10,
@@ -41,25 +46,66 @@ const options= {
  
   const client = useCreateChatClient({
     apiKey,
-    tokenOrProvider: userToken,
+    tokenOrProvider: auth.token,
     userData: user,
   });
 
+  const Serverclient = StreamChat.getInstance(apiKey);
+
   useEffect(()=>{
-    const checkClient = async()=>{
-          if(!client) return;
-          const channel = client.channel("messaging", "travel", {
-            name: "Awesome channel about traveling",
-          });
-          // Here, 'travel' will be the channel ID
-          await channel.watch();
+    if (!auth.userId || !auth.token) {
+      console.error("❌ No user or token in store! Redirecting to signup...");
+      navigate("/auth");
+      return;
     }
-    checkClient();
-  },[client])
 
-  console.log(client?.activeChannels);
+    console.log("✅ Using Store User:", auth.userId);
+    console.log("✅ Using Store Token:", auth.token);
 
-  if (!client) return <div>Setting up client & connection...</div>;
+    const connectChat = async () => {
+      try {
+        if (Serverclient.userID && Serverclient.userID !== auth.userId) {
+          console.log("🔄 Switching user: Disconnecting previous session...");
+          await Serverclient.disconnectUser(); // ✅ Properly disconnect old user before switching
+        }
+
+        if (!Serverclient.userID || Serverclient.userID !== auth.userId) {
+          console.log("🚀 Connecting to Stream Chat as:", auth.userId);
+          await Serverclient.connectUser(
+            { id: auth.userId, name: auth.userId },
+            auth.token
+          );
+        }
+
+        console.log("✅ Chat connected successfully!");
+
+        const chatChannel = Serverclient.channel("messaging", `ai-coach-chat-${auth.userId}`, {
+          members: [auth.userId, "ai_coach"],
+        });
+
+        console.log("chanale created", chatChannel)
+
+        await chatChannel.create();
+        await chatChannel.watch();
+        setChannel(chatChannel);
+        setIsReady(true);
+      } catch (error) {
+        console.error("❌ Chat connection error:", error);
+        navigate("/auth");
+      }
+    };
+
+    connectChat();
+
+   
+    return () => {
+      console.log("🔌 Cleaning up Stream Chat...");
+      setIsReady(false);
+    };
+  },[auth.userId,auth.token])
+
+
+  if (!client || !channel || !isReady || !Serverclient) return <div>Setting up client & connection...</div>;
 
     
     
@@ -67,9 +113,9 @@ const options= {
   return (
     <Chat client={client}>
       <ChannelList filters={filters} sort={sort} options={options} />
-      <Channel Message={MyMessage}>
+      <Channel Message={MyMessage} channel={channel}>
         <Window>
-          <MyChannelHeader client={client} />
+          <MyChannelHeader client={Serverclient} />
           <MessageList />
           <MyAIStateIndicator />
           <MessageInput />

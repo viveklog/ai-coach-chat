@@ -11,7 +11,7 @@ load_dotenv()
 STREAM_API_KEY = os.getenv("STREAM_API_KEY")
 STREAM_API_SECRET = os.getenv("STREAM_API_SECRET")
 
-AI_COACH_API_URL = "https://2be9-2406-7400-9a-1426-9b2-c5da-ff36-f041.ngrok-free.app/chat/ai-coach"
+AI_COACH_API_URL = "https://d352-2406-7400-9a-3ffe-f544-83f0-7d14-fd1c.ngrok-free.app/chat/ai-coach"
 
 # Initialize Stream Chat Client
 client = stream_chat.StreamChat(api_key=STREAM_API_KEY, api_secret=STREAM_API_SECRET)

@@ -20,7 +20,8 @@ export default function AuthPage() {
       } else {
         data = await login(username);
       }
-      auth.login(data.token, data.user_id);
+      console.log("my data:",data)
+      auth.login(data.token, data.user_id,);
       navigate("/chat"); // Redirect to chat page after authentication
     } catch (err) {
       setError(err.message);
@@ -28,7 +29,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-100">
       <form onSubmit={handleAuth} className="bg-white p-6 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-semibold mb-4">{isSignup ? "Sign Up" : "Login"}</h2>
         {error && <p className="text-red-500">{error}</p>}

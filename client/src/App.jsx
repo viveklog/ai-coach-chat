@@ -3,12 +3,15 @@ import AuthPage from "./pages/AuthPage";
 import ChatPage from "./pages/ChatPage";
 import useAuthStore from "./store/authStore";
 import './App.css';
+import LandingPage from "./pages/LandingPage";
+
 export default function App() {
   const auth = useAuthStore();
 
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route
           path="/chat"

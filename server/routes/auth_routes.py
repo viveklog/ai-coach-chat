@@ -51,7 +51,7 @@ ensure_ai_coach_exists()
 def signup(user: UserSignup):
     try:
         # Create user in Stream.io
-        chat_client.upsert_user({"id": user.username, "name": user.full_name})
+        chat_client.upsert_user({"id": user.username, "role": "admin", "name": user.full_name})
         # Generate authentication token
         token = chat_client.create_token(user.username)
         return {"token": token, "user_id": user.username}

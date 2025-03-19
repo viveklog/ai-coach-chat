@@ -1,5 +1,5 @@
-import { useChannelStateContext } from 'stream-chat-react';
-import { useWatchers } from '../useWatchers';
+import { useChannelStateContext,  ChannelHeader,
+ } from 'stream-chat-react';
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
@@ -8,17 +8,12 @@ export default function MyChannelHeader({client}) {
   const auth = useAuthStore();
   
   const { channel } = useChannelStateContext();
-  const { watchers } = useWatchers({ channel });
 
-  const aiInChannel =
-    (watchers ?? []).filter((watcher) => watcher.includes('ai-bot')).length > 0;
   return (
     <div className='my-channel-header'>
+                <ChannelHeader live={true} title={auth.userId} />
+      
       <h2>{channel?.data?.name ?? 'Chat with an AI'}</h2>
-
-      <button onClick={addOrRemoveAgent}>
-        {aiInChannel ? 'Remove AI' : 'Add AI'}
-      </button>
       <button
           onClick={async () => {
             console.log("🔌 Disconnecting Stream Chat user...");
@@ -33,14 +28,4 @@ export default function MyChannelHeader({client}) {
     </div>
   );
 
-  async function addOrRemoveAgent() {
-    if (!channel) return;
-    const endpoint = aiInChannel ? 'stop-ai-agent' : 'start-ai-agent';
-    await fetch(`http://127.0.0.1:3000/${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channel_id: channel.id }),
-    });
-    console.log(`channel ${endpoint}`);
-  }
 }
