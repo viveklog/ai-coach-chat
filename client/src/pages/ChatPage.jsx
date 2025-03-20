@@ -59,9 +59,6 @@ const options= {
       return;
     }
 
-    console.log("✅ Using Store User:", auth.userId);
-    console.log("✅ Using Store Token:", auth.token);
-
     const connectChat = async () => {
       try {
         if (Serverclient.userID && Serverclient.userID !== auth.userId) {
@@ -82,8 +79,6 @@ const options= {
         const chatChannel = Serverclient.channel("messaging", `ai-coach-chat-${auth.userId}`, {
           members: [auth.userId, "ai_coach"],
         });
-
-        console.log("chanale created", chatChannel)
 
         await chatChannel.create();
         await chatChannel.watch();

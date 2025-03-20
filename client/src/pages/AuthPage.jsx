@@ -20,7 +20,6 @@ export default function AuthPage() {
       } else {
         data = await login(username);
       }
-      console.log("my data:",data)
       auth.login(data.token, data.user_id,);
       navigate("/chat"); // Redirect to chat page after authentication
     } catch (err) {
