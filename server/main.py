@@ -7,12 +7,16 @@ from routes import chatbot_handler
 
 app = FastAPI()
 
+ALLOWED_ORIGINS = [
+    "https://ai-coach-chat.pages.dev",  # Production frontend
+]
+
 app.add_middleware(
-    CORSMiddleware, 
-    allow_origins=["https://ai-coach-chat.pages.dev","http://localhost:5173"],  # Allow requests from React frontend
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,  # Only allow trusted domains
+    allow_credentials=True,  # Allow authentication credentials (cookies, tokens)
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Only allow necessary HTTP methods
+    allow_headers=["Authorization", "Content-Type"],  # Only allow necessary headers
 )
 
 app.include_router(auth_routes.router, prefix="/auth")

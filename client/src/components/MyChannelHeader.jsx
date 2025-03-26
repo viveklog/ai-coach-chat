@@ -10,7 +10,7 @@ export default function MyChannelHeader({client}) {
   const { channel } = useChannelStateContext();
 
   return (
-    <div className='my-channel-header'>
+    <div className='my-channel-header bg-blue'>
                 <ChannelHeader live={true} title={auth.userId} />
       
       <h2>{channel?.data?.name ?? 'Chat with an AI'}</h2>
