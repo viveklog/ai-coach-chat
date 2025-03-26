@@ -2,17 +2,19 @@ import { useState } from "react";
 import { signup, login } from "../api/auth";
 import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";
-
+import LoadingAnimation from "../components/UI/LoadingAnimation";
 export default function AuthPage() {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   const auth = useAuthStore();
   const navigate = useNavigate();
 
   const handleAuth = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       let data;
       if (isSignup) {
@@ -21,8 +23,10 @@ export default function AuthPage() {
         data = await login(username);
       }
       auth.login(data.token, data.user_id,);
+      setLoading(false);
       navigate("/chat"); // Redirect to chat page after authentication
     } catch (err) {
+      setLoading(false)
       setError(err.message);
     }
   };
@@ -50,6 +54,9 @@ export default function AuthPage() {
             required
           />
         )}
+        {loading && <div className="flex items-center justify-center p-5 ">
+          <LoadingAnimation />
+          </div>}
         <button className="w-full bg-blue-600 text-white p-2 rounded">
           {isSignup ? "Sign Up" : "Login"}
         </button>
